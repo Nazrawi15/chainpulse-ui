@@ -233,6 +233,7 @@ export default function Marketplace() {
       functionName: "subscribe",
       args: [strategyId],
       gas: 200000n,
+      chainId: 50312,
     }, {
       onSuccess: (hash) => setPendingTx(hash),
     });
@@ -247,6 +248,7 @@ export default function Marketplace() {
       args: [strategyId, 7n],
       value: parseEther("0.01"),
       gas: 300000n,
+      chainId: 50312,
     }, {
       onSuccess: (hash) => setPendingTx(hash),
     });

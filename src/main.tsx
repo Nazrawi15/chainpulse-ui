@@ -9,7 +9,11 @@ import "./index.css";
 
 const config = createConfig({
   chains: [somniaTestnet],
-  connectors: [injected()],
+  connectors: [
+    injected({
+      target: "metaMask",
+    }),
+  ],
   transports: {
     [somniaTestnet.id]: http(),
   },
