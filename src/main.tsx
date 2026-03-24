@@ -12,6 +12,7 @@ const config = createConfig({
   connectors: [
     injected({
       target: "metaMask",
+      shimDisconnect: true,
     }),
   ],
   transports: {

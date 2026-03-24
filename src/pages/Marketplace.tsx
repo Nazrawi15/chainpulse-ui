@@ -1,7 +1,6 @@
 import { useReadContract, useWriteContract, useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { useState } from "react";
 import { CONTRACT_ADDRESSES, REGISTRY_ABI } from "../config";
-import { parseEther } from "viem";
 import LiveFeed from "../components/LiveFeed";
 
 type Strategy = {
@@ -235,7 +234,14 @@ export default function Marketplace() {
       gas: 200000n,
       chainId: 50312,
     }, {
-      onSuccess: (hash) => setPendingTx(hash),
+      onSuccess: (hash) => {
+        console.log("✅ Subscribe tx:", hash);
+        setPendingTx(hash);
+      },
+      onError: (error) => {
+        console.error("❌ Subscribe error:", error);
+        alert("Subscribe failed: " + error.message);
+      },
     });
   };
 
@@ -246,11 +252,18 @@ export default function Marketplace() {
       abi: REGISTRY_ABI,
       functionName: "subscribeWithCommitMode",
       args: [strategyId, 7n],
-      value: parseEther("0.01"),
+      value: BigInt("10000000000000000"),
       gas: 300000n,
       chainId: 50312,
     }, {
-      onSuccess: (hash) => setPendingTx(hash),
+      onSuccess: (hash) => {
+        console.log("✅ Commit Mode tx:", hash);
+        setPendingTx(hash);
+      },
+      onError: (error) => {
+        console.error("❌ Commit Mode error:", error);
+        alert("Commit failed: " + error.message);
+      },
     });
   };
 

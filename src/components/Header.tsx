@@ -1,17 +1,20 @@
-import { useAccount, useConnect, useDisconnect } from "wagmi";
+import { useAccount, useConnect, useDisconnect, useSwitchChain } from "wagmi";
 import { injected } from "wagmi/connectors";
 
 export default function Header({ activePage, setActivePage }: {
   activePage: string;
   setActivePage: (page: string) => void;
 }) {
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, chainId } = useAccount();
   const { connect } = useConnect();
   const { disconnect } = useDisconnect();
+  const { switchChain } = useSwitchChain();
 
   const shortAddress = address
     ? `${address.slice(0, 6)}...${address.slice(-4)}`
     : "";
+
+  const isWrongChain = isConnected && chainId !== 50312;
 
   return (
     <header style={{
@@ -84,15 +87,35 @@ export default function Header({ activePage, setActivePage }: {
       </nav>
 
       {/* Wallet */}
-      <div>
+      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
         {isConnected ? (
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <>
+            {/* Wrong chain warning */}
+            {isWrongChain && (
+              <button
+                onClick={() => switchChain({ chainId: 50312 })}
+                style={{
+                  background: "var(--red)",
+                  border: "none",
+                  color: "#fff",
+                  padding: "6px 12px",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  fontFamily: "var(--font-display)",
+                  fontWeight: 700,
+                  fontSize: "12px",
+                  animation: "pulse-green 2s infinite",
+                }}
+              >⚠️ Switch to Somnia</button>
+            )}
+
+            {/* Address */}
             <div style={{
               display: "flex",
               alignItems: "center",
               gap: "6px",
-              background: "var(--green-dim)",
-              border: "1px solid var(--green-glow)",
+              background: isWrongChain ? "var(--red-dim)" : "var(--green-dim)",
+              border: `1px solid ${isWrongChain ? "var(--red)" : "var(--green-glow)"}44`,
               padding: "6px 12px",
               borderRadius: "6px",
             }}>
@@ -100,15 +123,17 @@ export default function Header({ activePage, setActivePage }: {
                 width: "6px",
                 height: "6px",
                 borderRadius: "50%",
-                background: "var(--green)",
+                background: isWrongChain ? "var(--red)" : "var(--green)",
                 animation: "pulse-green 2s infinite",
               }} />
               <span style={{
                 fontFamily: "var(--font-mono)",
                 fontSize: "12px",
-                color: "var(--green)",
+                color: isWrongChain ? "var(--red)" : "var(--green)",
               }}>{shortAddress}</span>
             </div>
+
+            {/* Disconnect */}
             <button
               onClick={() => disconnect()}
               style={{
@@ -123,7 +148,7 @@ export default function Header({ activePage, setActivePage }: {
                 transition: "all 0.2s",
               }}
             >Disconnect</button>
-          </div>
+          </>
         ) : (
           <button
             onClick={() => connect({ connector: injected() })}
